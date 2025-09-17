@@ -1,11 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <title>Doctor Booking Quick App</title>
 </head>
 <body>
-    App
+  <h2>Doctor Appointment Booking (Quick Demo)</h2>
+
+  <h3>Register</h3>
+  <input id="rname" placeholder="Name">
+  <input id="remail" placeholder="Email">
+  <input id="rpass" placeholder="Password">
+  <button onclick="register()">Register</button>
+
+  <h3>Login</h3>
+  <input id="lemail" placeholder="Email">
+  <input id="lpass" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <p id="status"></p>
+
+  <h3>Doctors</h3>
+  <button onclick="loadDoctors()">Load All Doctors</button>
+  <ul id="doclist"></ul>
+
+  <h3>Recommend Doctor</h3>
+  <input id="sym" placeholder="Enter symptoms">
+  <button onclick="recommend()">Recommend</button>
+  <ul id="reclist"></ul>
+
+  <h3>Book Appointment</h3>
+  <input id="docid" placeholder="Doctor ID">
+  <input id="dt" type="datetime-local">
+  <button onclick="book()">Book</button>
+
+  <script>
+    let token = null;
+
+    async function register(){
+      const res = await fetch('http://localhost:5000/api/auth/register',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ name:document.getElementById('rname').value, email:document.getElementById('remail').value, password:document.getElementById('rpass').value })
+      });
+      alert('Registered');
+    }
+
+    async function login(){
+      const res = await fetch('http://localhost:5000/api/auth/login',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ email:document.getElementById('lemail').value, password:document.getElementById('lpass').value })
+      });
+      const data = await res.json();
+      if(data.ok){ token=data.token; document.getElementById('status').innerText='Logged in ✅'; }
+      else alert(data.error);
+    }
+
+    async function loadDoctors(){
+      const res = await fetch('http://localhost:5000/api/doctors');
+      const docs = await res.json();
+      document.getElementById('doclist').innerHTML = docs.map(d=>`<li>${d._id} - ${d.name} (${d.specialization})</li>`).join('');
+    }
+
+    async function recommend(){
+      const sym = document.getElementById('sym').value;
+      const res = await fetch('http://localhost:5000/api/doctors/recommend',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ symptoms:sym })
+      });
+      const data = await res.json();
+      document.getElementById('reclist').innerHTML = data.doctors.map(d=>`<li>${d._id} - ${d.name} (${d.specialization})</li>`).join('');
+    }
+
+    async function book(){
+      if(!token) return alert('Login first');
+      const res = await fetch('http://localhost:5000/api/appointments',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body:JSON.stringify({ doctorId:document.getElementById('docid').value, datetime:document.getElementById('dt').value })
+      });
+      const data = await res.json();
+      if(data.ok) alert('Booked!');
+      else alert(data.error);
+    }
+  </script>
 </body>
 </html>

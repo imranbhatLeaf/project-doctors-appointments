@@ -3,10 +3,33 @@
 <head>
   <title>Doctor Booking Quick App</title>
 </head>
+<style>
+    body{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        background-color: rgb(81, 95, 95);
+        color: rgb(91, 255, 200);
+
+    }
+    input:focus{
+        outline: none;
+    }
+    input{
+        height: 50px;
+        width: auto;
+        border-radius: 5px;
+        /* outline: none; */
+        border:none;
+    }
+</style>
 <body>
   <h2>Doctor Appointment Booking (Quick Demo)</h2>
 
-  <h3>Register</h3>
+  <div class="inputs" style="gap: 5px; display: flex; flex-direction: column; font-size: 40px;">
+      
+      <h3>Register</h3>
   <input id="rname" placeholder="Name">
   <input id="remail" placeholder="Email">
   <input id="rpass" placeholder="Password">
@@ -17,23 +40,24 @@
   <input id="lpass" placeholder="Password">
   <button onclick="login()">Login</button>
   <p id="status"></p>
-
+  
   <h3>Doctors</h3>
   <button onclick="loadDoctors()">Load All Doctors</button>
   <ul id="doclist"></ul>
-
+  
   <h3>Recommend Doctor</h3>
   <input id="sym" placeholder="Enter symptoms">
   <button onclick="recommend()">Recommend</button>
   <ul id="reclist"></ul>
-
+  
   <h3>Book Appointment</h3>
   <input id="docid" placeholder="Doctor ID">
   <input id="dt" type="datetime-local">
   <button onclick="book()">Book</button>
-
+</div>
+  
   <script>
-    let token = null;
+      let token = null;
 
     async function register(){
       const res = await fetch('http://localhost:5000/api/auth/register',{
